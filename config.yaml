@@ -1,5 +1,5 @@
 logger:
-  mode: "dev"
+  mode: "local"
   debug: true
 # http server config
 http:

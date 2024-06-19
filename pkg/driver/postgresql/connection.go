@@ -49,7 +49,7 @@ func getPostgresSQLDialector(
 	return postgres.Open(dsn)
 }
 
-func New(conn Connection) (*gorm.DB, error) {
+func New(conn Connection, logSql bool) (*gorm.DB, error) {
 	dialector := getPostgresSQLDialector(
 		conn.Host, conn.Port,
 		conn.Username, conn.Password,
@@ -58,8 +58,11 @@ func New(conn Connection) (*gorm.DB, error) {
 	if conn.Schema == "" {
 		conn.Schema = "public"
 	}
-
-	logger := newLogger(log.Env(), log.Sensitive())
+	logLevel := log.Env()
+	if logSql {
+		logLevel = log.ModeDevelopment
+	}
+	logger := newLogger(logLevel, log.Sensitive())
 	db, err := gorm.Open(dialector, &gorm.Config{
 		Logger: logger,
 		NamingStrategy: schema.NamingStrategy{

@@ -9,6 +9,7 @@ import (
 	"example/pkg/driver/postgresql"
 	"example/pkg/log"
 
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 )
 
@@ -27,6 +28,9 @@ func NewInstance() *Instance {
 // Start starts the server
 func (i *Instance) Start(ctx context.Context) {
 	i.ctx = ctx
+	if log.Env() != log.ModeDevelopment {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	var err error
 	db, err := postgresql.New(postgresql.Connection{
 		Host:         configreader.Config.Postgresql.Host,
@@ -38,7 +42,7 @@ func (i *Instance) Start(ctx context.Context) {
 		MaxIdleConns: configreader.Config.Postgresql.MaxIdleConns,
 		MaxOpenConns: configreader.Config.Postgresql.MaxOpenConns,
 		MaxLifetime:  cast.ToDuration(configreader.Config.Postgresql.MaxLifetime),
-	})
+	}, configreader.Config.Postgresql.LogSQL)
 	if err != nil {
 		log.Fatalf("init db error", "error", err)
 	}

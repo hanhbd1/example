@@ -25,15 +25,17 @@ func main() {
 		),
 	)
 	err := config.UnmarshalToStruct("", &configreader.Config)
+	cfg := configreader.Config
 	if err != nil {
 		panic(err)
 	}
+
 	a := core.NewApp(
 		core.AppWithName(appName),
 		core.AppWithLogger(
-			configreader.Config.Logger.Mode,
-			configreader.Config.Logger.Debug,
-			configreader.Config.Logger.Sensitive,
+			cfg.Logger.Mode,
+			cfg.Logger.Debug,
+			cfg.Logger.Sensitive,
 		),
 		core.AppWithAction(
 			server.NewInstance(),

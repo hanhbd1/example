@@ -1,4 +1,4 @@
-NAME=chainadmin-service
+NAME=example
 
 .PHONY: build
 ## build: Compile the packages.
