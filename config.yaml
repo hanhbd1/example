@@ -1,0 +1,24 @@
+logger:
+  mode: "dev"
+  debug: true
+# http server config
+http:
+  host: localhost
+  port: 5050
+
+runtime:
+  maxProcs: 100
+
+# database config
+postgresql:
+  host: "localhost"
+  port: 5432
+  username: "postgres"
+  password: "password"
+  databaseName: "example_db"
+  maxIdleConns: 10
+  maxOpenConns: 100
+  maxLifetime: "1h"
+  parameters: "parseTime=true"
+  logSql: true
+  autoMigrate: true
