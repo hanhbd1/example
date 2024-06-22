@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"example/internal/models"
+	"example/pkg/cache"
 
 	"go.uber.org/multierr"
 	"gorm.io/gorm"
@@ -12,6 +13,7 @@ import (
 
 type DataStorage struct {
 	db            *gorm.DB
+	cache         cache.Cache
 	inTransaction bool
 }
 
@@ -28,6 +30,10 @@ func (ds *DataStorage) Close() error {
 		return err
 	}
 	return db.Close()
+}
+
+func (ds *DataStorage) SetCache(c cache.Cache) {
+	ds.cache = c
 }
 
 func (ds *DataStorage) Migrate() error {

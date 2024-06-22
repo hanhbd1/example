@@ -34,4 +34,13 @@ type ConfigData struct {
 		LogSQL       bool   `mapstructure:"logSql"`
 		AutoMigrate  bool   `mapstructure:"autoMigrate"`
 	} `mapstructure:"postgresql"`
+	Redis struct {
+		Address  string `mapstructure:"address"`
+		Password string `mapstructure:"password"`
+		DB       int    `mapstructure:"db"`
+		//maxretries: 2
+		//poolsize: 10
+		MaxRetries int `mapstructure:"maxRetries"`
+		PoolSize   int `mapstructure:"poolSize"`
+	} `mapstructure:"redis"`
 }

@@ -73,6 +73,13 @@ func (h *Handler) GetPersonnel(c *gin.Context) {
 		})
 		return
 	}
+	if p == nil {
+		c.JSON(404, dto.CommonError{
+			Message: "personnel not found",
+			Code:    "not_found",
+		})
+		return
+	}
 	edus, err := h.ds.ListEducationsByPersonnelId(c.Request.Context(), p.Id)
 	c.JSON(200, dto.PersonnelResponse{
 		Person:     mapper.ToPersonnelDTO(p),

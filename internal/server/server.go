@@ -5,8 +5,11 @@ import (
 
 	"example/configreader"
 	"example/internal/storage"
+	"example/pkg/cache"
+	"example/pkg/cache/redis_cache"
 	"example/pkg/core"
 	"example/pkg/driver/postgresql"
+	"example/pkg/driver/redis"
 	"example/pkg/log"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +21,7 @@ type Instance struct {
 	ctx        context.Context
 	httpServer *core.HTTPServer
 	ds         *storage.DataStorage
+	cache      cache.Cache
 }
 
 // NewInstance returns a new instance of our server
@@ -53,6 +57,27 @@ func (i *Instance) Start(ctx context.Context) {
 		if err != nil {
 			log.Fatalf("migrate db error", "error", err)
 		}
+	}
+	// init redis standalone, see more type of redis in pkg/driver/redis
+	redisClient, err := redis.NewConnection(&redis.SingleConnection{
+		Address:    configreader.Config.Redis.Address,
+		Password:   configreader.Config.Redis.Password,
+		DB:         configreader.Config.Redis.DB,
+		MaxRetries: configreader.Config.Redis.MaxRetries,
+		PoolSize:   configreader.Config.Redis.PoolSize,
+	})
+	if err != nil {
+		log.Fatalf("init redis error", "error", err)
+	}
+	i.cache, err = redis_cache.New(redis_cache.WithName("example-cache"),
+		redis_cache.WithContext(ctx),
+		redis_cache.WithClient(redisClient))
+	if err != nil {
+		log.Warnw("init cache error", "error", err)
+	}
+	if i.cache != nil {
+		// set cache for data storage
+		i.ds.SetCache(i.cache)
 	}
 	var routerOption []core.HTTPRouterOption
 	routerOption = append(routerOption, Recover())
