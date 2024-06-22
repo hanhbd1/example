@@ -1,0 +1,6 @@
+redis:
+  address: ["redis-sentinel:26379"]
+  masterGroup: "mymaster"
+  password: ""
+  maxRetries: 3
+  poolSize: 5

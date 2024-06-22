@@ -1,0 +1,5 @@
+redis:
+  address: ["redis-node-0:6479","redis-node-1:6579","redis-node-2:6679","redis-node-3:6779","redis-node-4:6879","redis-node-5:6979"]
+  password: "bitnami"
+  maxRetries: 3
+  poolSize: 5

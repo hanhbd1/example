@@ -1,0 +1,6 @@
+redis:
+  address: "redis:6379"
+  password: ""
+  db: 0
+  maxretries: 0
+  poolsize: 0
