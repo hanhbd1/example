@@ -5,6 +5,9 @@ check on file `config.yaml`
 
 to enable sql log
 
+See more in redis driver to set up different type of redis connection
+
+
 
 ## Run
 
