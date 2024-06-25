@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"example/configreader"
+	"example/internal/mqserver"
 	"example/internal/server"
 	"example/pkg/config"
 	"example/pkg/core"
@@ -29,7 +30,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
+	var appAction core.AppAction
+	if cfg.RunMode == "api" {
+		appAction = server.NewInstance()
+	} else {
+		appAction = mqserver.NewInstance()
+	}
 	a := core.NewApp(
 		core.AppWithName(appName),
 		core.AppWithLogger(
@@ -38,7 +44,7 @@ func main() {
 			cfg.Logger.Sensitive,
 		),
 		core.AppWithAction(
-			server.NewInstance(),
+			appAction,
 		),
 	)
 

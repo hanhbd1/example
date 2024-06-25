@@ -1,3 +1,5 @@
+runMode: "api"
+
 logger:
   mode: "local"
   debug: true
@@ -29,3 +31,8 @@ redis:
   db: 0
   maxRetries: 2
   poolSize: 10
+
+queue:
+  provider: "amqp"
+  amqp: "amqp://guest:guest@localhost:5672/"
+  name: "subscriber_name"

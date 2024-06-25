@@ -8,7 +8,8 @@ func init() {
 }
 
 type ConfigData struct {
-	Logger struct {
+	RunMode string `mapstructure:"runMode"`
+	Logger  struct {
 		Mode      string `mapstructure:"mode"`
 		Debug     bool   `mapstructure:"debug"`
 		Sensitive bool   `mapstructure:"sensitive"`
@@ -43,4 +44,9 @@ type ConfigData struct {
 		MaxRetries int `mapstructure:"maxRetries"`
 		PoolSize   int `mapstructure:"poolSize"`
 	} `mapstructure:"redis"`
+	Queue struct {
+		Provider string `mapstructure:"provider"`
+		Amqp     string `mapstructure:"amqp"`
+		Name     string `mapstructure:"name"`
+	} `mapstructure:"queue"`
 }
