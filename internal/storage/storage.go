@@ -17,6 +17,18 @@ type DataStorage struct {
 	inTransaction bool
 }
 
+func (ds *DataStorage) Name() string {
+	return "data_storage"
+}
+
+func (ds *DataStorage) Check() error {
+	sqlDB, err := ds.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Ping()
+}
+
 func New(db *gorm.DB) *DataStorage {
 	return &DataStorage{
 		db:            db,

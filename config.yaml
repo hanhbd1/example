@@ -36,3 +36,8 @@ queue:
   provider: "amqp"
   amqp: "amqp://guest:guest@localhost:5672/"
   name: "subscriber_name"
+
+prometheus:
+  enable: true
+  host: "localhost"
+  port: 9090

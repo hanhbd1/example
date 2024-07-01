@@ -10,6 +10,7 @@ import (
 	"example/pkg/core"
 	"example/pkg/driver/postgresql"
 	"example/pkg/driver/redis"
+	"example/pkg/http"
 	"example/pkg/log"
 
 	"github.com/gin-gonic/gin"
@@ -18,10 +19,11 @@ import (
 
 // Instance represents an instance of the server
 type Instance struct {
-	ctx        context.Context
-	httpServer *core.HTTPServer
-	ds         *storage.DataStorage
-	cache      cache.Cache
+	ctx              context.Context
+	httpServer       *core.HTTPServer
+	prometheusServer *core.HTTPServer
+	ds               *storage.DataStorage
+	cache            cache.Cache
 }
 
 // NewInstance returns a new instance of our server
@@ -69,12 +71,18 @@ func (i *Instance) Start(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("init redis error", "error", err)
 	}
-	i.cache, err = redis_cache.New(redis_cache.WithName("example-cache"),
+	redisCache, err := redis_cache.New(redis_cache.WithName("example-cache"),
 		redis_cache.WithContext(ctx),
 		redis_cache.WithClient(redisClient))
 	if err != nil {
 		log.Warnw("init cache error", "error", err)
 	}
+	if configreader.Config.Prometheus.Enable {
+		i.cache = cache.NewMetricAbleCache(redisCache, CacheHitFunc, CacheMissFunc, TotalCountFunc)
+	} else {
+		i.cache = redisCache
+	}
+
 	if i.cache != nil {
 		// set cache for data storage
 		i.ds.SetCache(i.cache)
@@ -82,6 +90,11 @@ func (i *Instance) Start(ctx context.Context) {
 	var routerOption []core.HTTPRouterOption
 	routerOption = append(routerOption, Recover())
 	routerOption = append(routerOption, CORS())
+	routerOption = append(routerOption, http.RegisterHealthCheck("/healthz", i.ds))
+	if configreader.Config.Prometheus.Enable {
+		routerOption = append(routerOption, http.Prometheus())
+		i.prometheusServer = http.StartPrometheus(configreader.Config.Prometheus.Host, configreader.Config.Prometheus.Port)
+	}
 
 	routerOption = append(routerOption, GetRoutes(i.ds)...)
 	router := core.NewHTTPRouter(
@@ -107,4 +120,7 @@ func (i *Instance) Start(ctx context.Context) {
 func (i *Instance) Shutdown(ctx context.Context) {
 	// Shutdown HTTP server
 	i.httpServer.Stop(ctx)
+	if i.prometheusServer != nil {
+		i.prometheusServer.Stop(ctx)
+	}
 }

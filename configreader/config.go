@@ -49,4 +49,9 @@ type ConfigData struct {
 		Amqp     string `mapstructure:"amqp"`
 		Name     string `mapstructure:"name"`
 	} `mapstructure:"queue"`
+	Prometheus struct {
+		Enable bool   `mapstructure:"enable"`
+		Host   string `mapstructure:"host"`
+		Port   int    `mapstructure:"port"`
+	} `mapstructure:"prometheus"`
 }

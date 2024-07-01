@@ -1,6 +1,9 @@
 package server
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 func SimpleAuthMiddleware(c *gin.Context) {
 	if c.GetHeader("Authorization") != "Bearer 123" {
@@ -18,4 +21,23 @@ func AdminMiddleware(c *gin.Context) {
 		return
 	}
 	c.Next()
+}
+
+// Setups the Prometheus cache metrics, can change if needed
+var prometheusCacheCounting = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "cache_metrics",
+		Help: "Counting cache hit and miss",
+	}, []string{"state"})
+
+func CacheMissFunc() {
+	prometheusCacheCounting.WithLabelValues("cache_miss").Inc()
+}
+
+func CacheHitFunc() {
+	prometheusCacheCounting.WithLabelValues("cache_hit").Inc()
+}
+
+func TotalCountFunc() {
+	prometheusCacheCounting.WithLabelValues("total").Inc()
 }
